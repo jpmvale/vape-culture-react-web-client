@@ -42,10 +42,7 @@ const useStyles = makeStyles((theme) => ({
 const EditClients = () => {
   const { id } = useParams();
   const [name, setName] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
-  const [birth_date, setBirthDate] = useState("");
+  const [category, setCategory] = useState("");
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -57,34 +54,24 @@ const EditClients = () => {
   };
 
   const getClientData = async () => {
-    await API.get("client/getClient/" + id)
+    await API.get("product/getProduct/" + id)
       .then((response) => {
         setName(response.data.name);
-        setCpf(response.data.cpf);
-        setBirthDate(response.data.birth_date);
-        setAddress(response.data.address);
-        setPhone(response.data.phone);
+        setCategory(response.data.category);
       })
       .catch((err) => {
         console.log(err.response);
       });
   };
 
-  const updateClient = async () => {
-    console.log("here");
-    await API.post("client/updateClient/" + id, {
+  const updateProduct = async () => {
+    await API.post("product/updateProduct/" + id, {
       name,
-      cpf,
-      birth_date,
-      address,
-      phone,
+      category,
     })
       .then((response) => {
         setName(response.data.name);
-        setCpf(response.data.cpf);
-        setBirthDate(response.data.birth_date);
-        setAddress(response.data.address);
-        setPhone(response.data.phone);
+        setCategory(response.data.category);
       })
       .catch((err) => {
         console.log(err.response);
@@ -103,7 +90,7 @@ const EditClients = () => {
       <Card variant="outlined">
         <form className={classes.centralize}>
           <CardContent>
-            <h1 className={classes.centralize}>Editar o Cliente {name}</h1>
+            <h1 className={classes.centralize}>Editar o Produto {name}</h1>
             <br />
             <TextField
               required
@@ -118,41 +105,11 @@ const EditClients = () => {
             <TextField
               required
               variant="outlined"
-              id="standard-required-cpf"
-              label="CPF"
-              value={cpf}
+              id="standard-required-category"
+              label="Categoria"
+              value={category}
               onChange={(e) => {
-                setCpf(e.target.value);
-              }}
-            />
-            <TextField
-              required
-              variant="outlined"
-              id="standard-required-birth-date"
-              label="Data de Nascimento"
-              value={birth_date}
-              onChange={(e) => {
-                setBirthDate(e.target.value);
-              }}
-            />
-            <TextField
-              required
-              variant="outlined"
-              id="standard-required-address"
-              label="Endereço"
-              value={address}
-              onChange={(e) => {
-                setAddress(e.target.value);
-              }}
-            />
-            <TextField
-              required
-              variant="outlined"
-              id="standard-required-number"
-              label="Número"
-              value={phone}
-              onChange={(e) => {
-                setPhone(e.target.value);
+                setCategory(e.target.value);
               }}
             />
           </CardContent>
@@ -161,7 +118,7 @@ const EditClients = () => {
               className={classes.centralize}
               onClick={() => {
                 handleOpen();
-                updateClient();
+                updateProduct();
               }}
               variant="outlined"
               color="primary"
@@ -183,7 +140,7 @@ const EditClients = () => {
               <Fade in={open}>
                 <div className={classes.paper}>
                   <h2 id="transition-modal-title">
-                    Usuário atualizado com sucesso!
+                    Produto atualizado com sucesso!
                   </h2>
                   <p
                     className={classes.centralize}

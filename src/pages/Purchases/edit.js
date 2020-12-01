@@ -9,6 +9,7 @@ import {
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Modal from "@material-ui/core/Modal";
+import { reset } from "nodemon";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
@@ -39,13 +40,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const EditClients = () => {
+const EditPurchase = () => {
   const { id } = useParams();
-  const [name, setName] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
-  const [birth_date, setBirthDate] = useState("");
+  const [product, setProduct] = useState("");
+  const [supplier, setSupplier] = useState("");
+  const [date, setDate] = useState("");
+  const [value, setValue] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -56,35 +57,43 @@ const EditClients = () => {
     setOpen(false);
   };
 
-  const getClientData = async () => {
-    await API.get("client/getClient/" + id)
+  const getPurchaseData = async () => {
+    await API.get("purchase/getPurchase/" + id)
       .then((response) => {
-        setName(response.data.name);
-        setCpf(response.data.cpf);
-        setBirthDate(response.data.birth_date);
-        setAddress(response.data.address);
-        setPhone(response.data.phone);
+        getProduct(response.data._id);
+        setSupplier(response.data.supplier);
+        setDate(response.data.date);
+        setValue(response.data.value);
+        setQuantity(response.data.quantity);
       })
       .catch((err) => {
         console.log(err.response);
       });
   };
 
-  const updateClient = async () => {
+  const getProduct = async (id) => {
+    await API.get("product/getProduct/" + id)
+      .then((response) => {
+        setProduct(response.data);
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
+
+  const updatePurchase = async () => {
     console.log("here");
     await API.post("client/updateClient/" + id, {
-      name,
-      cpf,
-      birth_date,
-      address,
-      phone,
+      supplier,
+      date,
+      value,
+      quantity,
     })
       .then((response) => {
-        setName(response.data.name);
-        setCpf(response.data.cpf);
-        setBirthDate(response.data.birth_date);
-        setAddress(response.data.address);
-        setPhone(response.data.phone);
+        setSupplier(response.data.supplier);
+        setDate(response.data.date);
+        setValue(response.data.value);
+        setQuantity(response.data.quantity);
       })
       .catch((err) => {
         console.log(err.response);
@@ -94,7 +103,7 @@ const EditClients = () => {
   const classes = useStyles();
 
   useEffect(() => {
-    getClientData();
+    getPurchaseData();
   }, []);
 
   return (
@@ -103,56 +112,54 @@ const EditClients = () => {
       <Card variant="outlined">
         <form className={classes.centralize}>
           <CardContent>
-            <h1 className={classes.centralize}>Editar o Cliente {name}</h1>
+            <h1 className={classes.centralize}>Editar a compra</h1>
             <br />
             <TextField
               required
               variant="outlined"
               id="standard-required-name"
-              label="Nome"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-              }}
+              label="Produto"
+              value={product.name}
+              disabled
             />
             <TextField
               required
               variant="outlined"
               id="standard-required-cpf"
-              label="CPF"
-              value={cpf}
+              label="Fornecedor"
+              value={supplier}
               onChange={(e) => {
-                setCpf(e.target.value);
+                setSupplier(e.target.value);
               }}
             />
             <TextField
               required
               variant="outlined"
               id="standard-required-birth-date"
-              label="Data de Nascimento"
-              value={birth_date}
+              label="Data"
+              value={date}
               onChange={(e) => {
-                setBirthDate(e.target.value);
+                setDate(e.target.value);
               }}
             />
             <TextField
               required
               variant="outlined"
               id="standard-required-address"
-              label="Endereço"
-              value={address}
+              label="Preço R$"
+              value={value}
               onChange={(e) => {
-                setAddress(e.target.value);
+                setValue(e.target.value);
               }}
             />
             <TextField
               required
               variant="outlined"
               id="standard-required-number"
-              label="Número"
-              value={phone}
+              label="Quantidade"
+              value={quantity}
               onChange={(e) => {
-                setPhone(e.target.value);
+                setQuantity(e.target.value);
               }}
             />
           </CardContent>
@@ -161,7 +168,7 @@ const EditClients = () => {
               className={classes.centralize}
               onClick={() => {
                 handleOpen();
-                updateClient();
+                updatePurchase();
               }}
               variant="outlined"
               color="primary"
@@ -183,14 +190,8 @@ const EditClients = () => {
               <Fade in={open}>
                 <div className={classes.paper}>
                   <h2 id="transition-modal-title">
-                    Usuário atualizado com sucesso!
+                    Compra atualizada com sucesso!
                   </h2>
-                  <p
-                    className={classes.centralize}
-                    id="transition-modal-description"
-                  >
-                    {name} foi atualizado
-                  </p>
                 </div>
               </Fade>
             </Modal>
@@ -201,4 +202,4 @@ const EditClients = () => {
   );
 };
 
-export default EditClients;
+export default EditPurchase;
