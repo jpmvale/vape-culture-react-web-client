@@ -1,16 +1,17 @@
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+
 import Navbar from "./components/navbar/Navbar";
-import Home from "./pages/Home";
-import Products from "./pages/Products";
-import Sales from "./pages/Sales";
-import Purchases from "./pages/Purchases";
 import Clients from "./pages/Clients";
 import EditClient from "./pages/Clients/edit";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
 import EditProduct from "./pages/Products/edit";
+import Purchases from "./pages/Purchases";
+import EditPurchase from "./pages/Purchases/edit";
+import Sales from "./pages/Sales";
+import EditSales from "./pages/Sales/edit";
 import Stock from "./pages/Stock";
 import EditStock from "./pages/Stock/edit";
-import EditPurchase from "./pages/Purchases/edit";
-import EditSales from "./pages/Sales/edit";
 
 function Routes() {
   return (

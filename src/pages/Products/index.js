@@ -1,23 +1,4 @@
-import {
-  Backdrop,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Fade,
-  IconButton,
-  Modal,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-} from "@material-ui/core";
+import { Backdrop, Button, Card, CardActions, CardContent, Fade, FormControl, IconButton, MenuItem, Modal, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -61,6 +42,9 @@ const useStyles = makeStyles((theme) => ({
   selectEmpty: {
     marginTop: theme.spacing(0),
   },
+  container: {
+    maxHeight: 600,
+  }
 }));
 
 const Products = () => {
@@ -277,11 +261,13 @@ const Products = () => {
         </form>
       </Card>
       <h2 className={classes.centralize}>Dados dos Produtos</h2>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} className={classes.container}>
         <Table
-          className={classes.table}
-          aria-label="a dense table"
+          className={classes.table && classes.centralize}
+          aria-label="a sticky dense table"
           size="small"
+          stickyHeader
+          style={{maxWidth: "50%"}}
         >
           <TableHead>
             <TableRow>

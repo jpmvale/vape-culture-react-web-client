@@ -1,15 +1,7 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  makeStyles,
-  TextField,
-} from "@material-ui/core";
+import { Button, Card, CardActions, CardContent, makeStyles, TextField } from "@material-ui/core";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Modal from "@material-ui/core/Modal";
-import { reset } from "nodemon";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 

@@ -1,21 +1,4 @@
-import {
-  Backdrop,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Fade,
-  IconButton,
-  Modal,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  FormControl,
-} from "@material-ui/core";
+import { Backdrop, Button, Card, CardActions, CardContent, Fade, FormControl, IconButton, MenuItem, Modal, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -71,23 +54,24 @@ const Stock = () => {
 
   const getStockData = async () => {
     await API.get("stock/getStocks")
-      .then((response) => {
-        setRows(
-          response.data.map((stock) => {
-            let pr = products.find(
-              (product) => product._id === stock.productId
-            );
-            stock = {
-              name: pr.name,
-              category: pr.category,
-              quantity: stock.quantity,
-            };
-          })
-        );
-        console.log(rows);
+      .then((stockResponse) => { 
+        API.get("/product/getProducts").then(response =>{
+              let prs = response.data;
+              stockResponse.data.map((stock) => {   
+                let pr = prs.find(
+                  product => product._id == stock.productId
+                );
+                stock = {
+                  name: pr.name,
+                  category: pr.category,
+                  quantity: stock.quantity,
+                };
+                setRows(oldArray => [...oldArray, stock])
+              });
+        });
       })
       .catch((err) => {
-        console.log(err.response);
+        console.log(err);
       });
   };
 
@@ -95,6 +79,7 @@ const Stock = () => {
     await API.get("product/getProducts")
       .then((response) => {
         setProducts(response.data);
+        getStockData();
       })
       .catch((err) => {
         console.log(err);
@@ -107,6 +92,15 @@ const Stock = () => {
     });
   };
 
+  const createStock = async () => {
+    await API.post("stock/createStock", {
+      productId: product._id,
+      quantity,
+    }).then(() => {
+      getStockData();
+    });
+  };
+
   const handleOpen = () => {
     setOpen(true);
   };
@@ -114,6 +108,19 @@ const Stock = () => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const setDeleteMsg = (id) => {
+    setModalOption(id);
+    setModalTitle("Você está prestes a DELETAR um produto, tem certeza?");
+    setModalContent("Esta alteração será irreversível");
+  };
+
+  const setCreateMsg = () => {
+    setModalOption("create");
+    setModalTitle("Você está prestes a criar um produto");
+    setModalContent("Clique no botão para continuar");
+  };
+
 
   const sortTable = (type) => {
     if (type === "name") {
@@ -131,17 +138,8 @@ const Stock = () => {
     }
   };
 
-  const setDeleteMsg = (id) => {
-    setModalOption(id);
-    setModalTitle(
-      "Você está prestes a DELETAR um item no estoque, tem certeza?"
-    );
-    setModalContent("Esta alteração será irreversível");
-  };
-
   useEffect(() => {
-    getStockData();
-    console.log(rows);
+    getProducts();
   }, []);
 
   const StyledTableCell = withStyles((theme) => ({
@@ -164,13 +162,104 @@ const Stock = () => {
 
   return (
     <>
-      <br />
-      <h2 className={classes.centralize}>Dados dos usários</h2>
+      <Card variant="outlined">
+        <form className={classes.centralize}>
+          <h2 className={classes.centralize}>Insira um novo registro no estoque</h2>
+          <CardContent>            
+            <FormControl className={classes.formControl}>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                displayEmpty
+                className={classes.selectEmpty}
+                value={product._id}
+                onChange={(e) => {
+                  setProduct(e.target.value);
+                }}
+                variant="outlined"
+              >
+                <MenuItem value="" disabled>
+                  <em>Selecione</em>
+                </MenuItem>
+                {products.map((pr) => (
+                   <MenuItem key={pr._id} value={pr._id}>{pr.name}</MenuItem>
+                ))}
+                {console.log(products)}                
+              </Select>
+            </FormControl>
+            <TextField
+              required
+              variant="outlined"
+              id="standard-required-name"
+              label="Quantidade"
+              value={quantity}
+              onChange={(e) => {
+                setQuantity(e.target.value);
+              }}
+            />
+          </CardContent>
+          <CardActions>
+            <Button
+              className={classes.centralize}
+              onClick={() => {
+                setCreateMsg();
+                handleOpen();
+              }}
+              variant="outlined"
+              color="primary"
+            >
+              Criar
+            </Button>
+            <Modal
+              aria-labelledby="transition-modal-title"
+              aria-describedby="transition-modal-description"
+              className={classes.modal}
+              open={open}
+              onClose={handleClose}
+              closeAfterTransition
+              BackdropComponent={Backdrop}
+              BackdropProps={{
+                timeout: 500,
+              }}
+            >
+              <Fade in={open}>
+                <div className={classes.paper}>
+                  <h2 id="transition-modal-title">{modalTitle}</h2>
+                  <p
+                    className={classes.centralize}
+                    id="transition-modal-description"
+                  >
+                    {modalContent}
+                  </p>
+                  <Button
+                    style={{ marginLeft: "35%" }}
+                    onClick={() => {
+                      if (modalOption === "create") {
+                        createStock();
+                      } else {
+                        deleteStock(modalOption);
+                      }
+                      handleClose();
+                    }}
+                    variant="outlined"
+                    color="primary"
+                  >
+                    Confirmar
+                  </Button>
+                </div>
+              </Fade>
+            </Modal>
+          </CardActions>
+        </form>
+      </Card>
+      <h2 className={classes.centralize}>Dados do estoque</h2>
       <TableContainer component={Paper}>
         <Table
-          className={classes.table}
+          className={classes.table && classes.centralize}
           aria-label="a dense table"
           size="small"
+          style={{maxWidth: "50%"}}
+          stickyHeader
         >
           <TableHead>
             <TableRow>
