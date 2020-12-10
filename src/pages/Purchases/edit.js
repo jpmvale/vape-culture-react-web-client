@@ -1,7 +1,9 @@
+import DateFnsUtils from '@date-io/date-fns';
 import { Button, Card, CardActions, CardContent, makeStyles, TextField } from "@material-ui/core";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Modal from "@material-ui/core/Modal";
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
@@ -34,9 +36,9 @@ const useStyles = makeStyles((theme) => ({
 
 const EditPurchase = () => {
   const { id } = useParams();
-  const [product, setProduct] = useState("");
+  const [name, setName] = useState("");
   const [supplier, setSupplier] = useState("");
-  const [date, setDate] = useState("");
+  const [purchaseDate, setPurchaseDate] = useState(new Date());
   const [value, setValue] = useState("");
   const [quantity, setQuantity] = useState("");
   const [open, setOpen] = useState(false);
@@ -52,9 +54,9 @@ const EditPurchase = () => {
   const getPurchaseData = async () => {
     await API.get("purchase/getPurchase/" + id)
       .then((response) => {
-        getProduct(response.data._id);
+        getProduct(response.data.productId);
         setSupplier(response.data.supplier);
-        setDate(response.data.date);
+        setPurchaseDate(response.data.date);
         setValue(response.data.value);
         setQuantity(response.data.quantity);
       })
@@ -66,7 +68,7 @@ const EditPurchase = () => {
   const getProduct = async (id) => {
     await API.get("product/getProduct/" + id)
       .then((response) => {
-        setProduct(response.data);
+        setName(response.data.name);
       })
       .catch((err) => {
         console.log(err.response);
@@ -74,22 +76,25 @@ const EditPurchase = () => {
   };
 
   const updatePurchase = async () => {
-    console.log("here");
-    await API.post("client/updateClient/" + id, {
+    await API.post("purchase/updatePurchase/" + id, {
       supplier,
-      date,
+      purchaseDate,
       value,
       quantity,
     })
       .then((response) => {
         setSupplier(response.data.supplier);
-        setDate(response.data.date);
+        setPurchaseDate(response.data.date);
         setValue(response.data.value);
         setQuantity(response.data.quantity);
       })
       .catch((err) => {
         console.log(err.response);
       });
+  };
+
+  const handleDateChange = (date) => {
+    setPurchaseDate(date);
   };
 
   const classes = useStyles();
@@ -111,7 +116,7 @@ const EditPurchase = () => {
               variant="outlined"
               id="standard-required-name"
               label="Produto"
-              value={product.name}
+              value={name}
               disabled
             />
             <TextField
@@ -124,16 +129,20 @@ const EditPurchase = () => {
                 setSupplier(e.target.value);
               }}
             />
-            <TextField
-              required
-              variant="outlined"
-              id="standard-required-birth-date"
-              label="Data"
-              value={date}
-              onChange={(e) => {
-                setDate(e.target.value);
-              }}
-            />
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
+                variant="inline"
+                inputVariant="outlined"
+                id="date-picker-dialog"
+                label="Date picker dialog"
+                format="dd/MM/yyyy"
+                value={setPurchaseDate}
+                onChange={handleDateChange}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+                />
+            </MuiPickersUtilsProvider>
             <TextField
               required
               variant="outlined"

@@ -261,7 +261,7 @@ const Products = () => {
         </form>
       </Card>
       <h2 className={classes.centralize}>Dados dos Produtos</h2>
-      <TableContainer component={Paper} className={classes.container}>
+      <TableContainer component={Paper} className={classes.container }>
         <Table
           className={classes.table && classes.centralize}
           aria-label="a sticky dense table"

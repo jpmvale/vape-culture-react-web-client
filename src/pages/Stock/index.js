@@ -56,17 +56,18 @@ const Stock = () => {
     await API.get("stock/getStocks")
       .then((stockResponse) => { 
         API.get("/product/getProducts").then(response =>{
-              let prs = response.data;
+              let prs = response.data;              
               stockResponse.data.map((stock) => {   
                 let pr = prs.find(
                   product => product._id == stock.productId
                 );
                 stock = {
+                  _id: stock._id,
                   name: pr.name,
                   category: pr.category,
                   quantity: stock.quantity,
                 };
-                setRows(oldArray => [...oldArray, stock])
+                setRows(oldArray => [...oldArray, stock])                
               });
         });
       })
@@ -75,29 +76,32 @@ const Stock = () => {
       });
   };
 
-  const getProducts = async () => {
-    await API.get("product/getProducts")
-      .then((response) => {
-        setProducts(response.data);
-        getStockData();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  const getProductsNotInStock = async () => {
+    await API.get("product/getProductsNotStocked/").then((response) => {
+      setProducts(response.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
 
   const deleteStock = async (id) => {
-    await API.post("stock/removeStock/" + id).then(() => {
+    console.log(id);
+    await API.post("/stock/removeStock/" + id).then(() => {
+      setRows([]);
       getStockData();
+      getProductsNotInStock();
     });
   };
 
   const createStock = async () => {
-    await API.post("stock/createStock", {
-      productId: product._id,
+    await API.post("stock/createStock/", {
+      productId: product,
       quantity,
     }).then(() => {
+      setRows([]);
       getStockData();
+      getProductsNotInStock();
     });
   };
 
@@ -110,6 +114,7 @@ const Stock = () => {
   };
 
   const setDeleteMsg = (id) => {
+    console.log(id);
     setModalOption(id);
     setModalTitle("Você está prestes a DELETAR um produto, tem certeza?");
     setModalContent("Esta alteração será irreversível");
@@ -139,7 +144,8 @@ const Stock = () => {
   };
 
   useEffect(() => {
-    getProducts();
+    getStockData();
+    getProductsNotInStock();
   }, []);
 
   const StyledTableCell = withStyles((theme) => ({
@@ -178,13 +184,10 @@ const Stock = () => {
                 }}
                 variant="outlined"
               >
-                <MenuItem value="" disabled>
-                  <em>Selecione</em>
-                </MenuItem>
+                <MenuItem key="disabled" disabled>Produto</MenuItem>
                 {products.map((pr) => (
                    <MenuItem key={pr._id} value={pr._id}>{pr.name}</MenuItem>
-                ))}
-                {console.log(products)}                
+                ))}            
               </Select>
             </FormControl>
             <TextField
@@ -287,7 +290,7 @@ const Stock = () => {
                   <IconButton
                     color="inherit"
                     aria-label="account"
-                    onClick={() => history.push(`/clients/edit/${row._id}`)}
+                    onClick={() => history.push(`/stock/edit/${row._id}`)}
                   >
                     <EditIcon />
                   </IconButton>
@@ -307,42 +310,7 @@ const Stock = () => {
               </StyledTableRow>
             ))}
           </TableBody>
-        </Table>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          className={classes.modal}
-          open={open}
-          onClose={handleClose}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500,
-          }}
-        >
-          <Fade in={open}>
-            <div className={classes.paper}>
-              <h2 id="transition-modal-title">{modalTitle}</h2>
-              <p
-                className={classes.centralize}
-                id="transition-modal-description"
-              >
-                {modalContent}
-              </p>
-              <Button
-                style={{ marginLeft: "35%" }}
-                onClick={() => {
-                  deleteStock(modalOption);
-                  handleClose();
-                }}
-                variant="outlined"
-                color="primary"
-              >
-                Confirmar
-              </Button>
-            </div>
-          </Fade>
-        </Modal>
+        </Table>        
       </TableContainer>
     </>
   );

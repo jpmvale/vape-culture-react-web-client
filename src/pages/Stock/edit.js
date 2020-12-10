@@ -1,11 +1,4 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  makeStyles,
-  TextField,
-} from "@material-ui/core";
+import { Button, Card, CardActions, CardContent, makeStyles, TextField } from "@material-ui/core";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Modal from "@material-ui/core/Modal";
@@ -64,8 +57,8 @@ const EditStock = () => {
       });
   };
 
-  const getProduct = async () => {
-    await API.get("product/getProduct" + id)
+  const getProduct = async (productId) => {
+    await API.get("product/getProduct/" + productId)
       .then((response) => {
         setName(response.data.name);
       })
@@ -75,7 +68,7 @@ const EditStock = () => {
   };
 
   const updateStock = async () => {
-    await API.post("product/updateProduct/" + id, {
+    await API.post("stock/updateStock/" + id, {
       quantity,
     })
       .then((response) => {
@@ -97,7 +90,7 @@ const EditStock = () => {
       <Card variant="outlined">
         <form className={classes.centralize}>
           <CardContent>
-            <h1 className={classes.centralize}>Editar o Produto {name}</h1>
+            <h1 className={classes.centralize}>Editar a quantidade em estoque do Produto {name}</h1>
             <br />
             <TextField
               required
@@ -114,7 +107,7 @@ const EditStock = () => {
               required
               variant="outlined"
               id="standard-required-category"
-              label="Categoria"
+              label="Quantidade"
               value={quantity}
               onChange={(e) => {
                 setQuantity(e.target.value);
